@@ -1,6 +1,7 @@
 locals {
+  effective_iam_user_name = var.iam_user_name != "" ? var.iam_user_name : "${var.bucket_prefix}-s3"
   bucket_names = {
-    for key, value in var.buckets : key => key == "hcv-tf-state" ? "${key}-${random_id.bucket_suffix.hex}" : "${var.workspace_name}-${key}-${random_id.bucket_suffix.hex}"
+    for key, value in var.buckets : key => key == "hcv-tf-state" ? "${key}-${random_id.bucket_suffix.hex}" : "${var.bucket_prefix}-${key}-${random_id.bucket_suffix.hex}"
   }
 }
 
@@ -38,23 +39,23 @@ module "s3_bucket" {
 
   tags = merge(var.tags, {
     Name        = local.bucket_names[each.key]
-    Environment = var.workspace_name
+    Environment = var.bucket_prefix
     Purpose     = each.value.purpose
   })
 }
 
-resource "aws_iam_user" "vault_s3" {
-  name = "${var.workspace_name}-vault-s3"
+resource "aws_iam_user" "s3" {
+  name = local.effective_iam_user_name
   tags = var.tags
 }
 
-resource "aws_iam_access_key" "vault_s3" {
-  user = aws_iam_user.vault_s3.name
+resource "aws_iam_access_key" "s3" {
+  user = aws_iam_user.s3.name
 }
 
-resource "aws_iam_user_policy" "vault_s3" {
-  name = "${var.workspace_name}-vault-s3-policy"
-  user = aws_iam_user.vault_s3.name
+resource "aws_iam_user_policy" "s3" {
+  name = "${local.effective_iam_user_name}-policy"
+  user = aws_iam_user.s3.name
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -78,4 +79,19 @@ resource "aws_iam_user_policy" "vault_s3" {
       }
     ]
   })
+}
+
+moved {
+  from = aws_iam_user.vault_s3
+  to   = aws_iam_user.s3
+}
+
+moved {
+  from = aws_iam_access_key.vault_s3
+  to   = aws_iam_access_key.s3
+}
+
+moved {
+  from = aws_iam_user_policy.vault_s3
+  to   = aws_iam_user_policy.s3
 }

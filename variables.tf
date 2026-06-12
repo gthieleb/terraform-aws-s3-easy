@@ -30,7 +30,13 @@ variable "tags" {
   }
 }
 
-variable "workspace_name" {
-  description = "Workspace or environment name used to prefix non-state bucket names and IAM resources."
+variable "bucket_prefix" {
+  description = "Prefix used for bucket names and IAM resources."
   type        = string
+}
+
+variable "iam_user_name" {
+  description = "Name of the IAM user created for bucket access. Defaults to '{bucket_prefix}-s3'."
+  type        = string
+  default     = ""
 }

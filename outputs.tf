@@ -10,16 +10,16 @@ output "bucket_arns" {
 
 output "iam_user_name" {
   description = "Name of the IAM user created for bucket access."
-  value       = aws_iam_user.vault_s3.name
+  value       = aws_iam_user.s3.name
 }
 
 output "access_key_id" {
   description = "AWS access key ID for the dedicated IAM user."
-  value       = aws_iam_access_key.vault_s3.id
+  value       = aws_iam_access_key.s3.id
 }
 
 output "secret_access_key" {
   description = "AWS secret access key for the dedicated IAM user."
-  value       = aws_iam_access_key.vault_s3.secret
+  value       = aws_iam_access_key.s3.secret
   sensitive   = true
 }

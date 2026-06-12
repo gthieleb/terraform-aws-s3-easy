@@ -12,11 +12,11 @@ provider "aws" {
 module "s3_easy" {
   source = "gthieleb/s3-easy/aws"
 
-  workspace_name = "prod"
+  bucket_prefix = "prod"
 
   buckets = {
     hcv-backup = {
-      purpose    = "Vault backup storage"
+      purpose    = "Backup storage"
       versioning = false
     }
     hcv-tf-state = {
@@ -26,7 +26,7 @@ module "s3_easy" {
   }
 
   tags = {
-    Project   = "hashicorp-vault-setup"
+    Project   = "terraform-aws-s3-easy"
     ManagedBy = "terraform"
   }
 }
@@ -36,7 +36,7 @@ module "s3_easy" {
 
 - Creates one S3 bucket per entry in `buckets`
 - Adds a random bucket suffix to keep names globally unique
-- Prefixes non-state buckets with `workspace_name`
+- Prefixes non-state buckets with `bucket_prefix`
 - Enables AES256 default encryption and blocks all public access
 - Creates a dedicated IAM user, access key, and inline policy for the buckets
 
@@ -47,7 +47,8 @@ module "s3_easy" {
 | `region` | AWS region used by module consumers when configuring resources. | `string` | `"eu-central-1"` | no |
 | `buckets` | Map of S3 buckets to create. | `map(object({ purpose = string, versioning = bool }))` | see `variables.tf` | no |
 | `tags` | Tags to apply to all resources. | `map(string)` | `{ ManagedBy = "terraform" }` | no |
-| `workspace_name` | Workspace or environment name used to prefix non-state bucket names and IAM resources. | `string` | n/a | yes |
+| `bucket_prefix` | Prefix used for bucket names and IAM resources. | `string` | n/a | yes |
+| `iam_user_name` | Name of the IAM user created for bucket access. Defaults to '{bucket_prefix}-s3'. | `string` | `""` | no |
 
 ## Outputs
 
