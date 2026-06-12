@@ -16,7 +16,7 @@ provider "aws" {
 module "s3_easy" {
   source = "../.."
 
-  workspace_name = "dev"
+  bucket_prefix = "dev"
   tags = {
     Project   = "terraform-aws-s3-easy"
     ManagedBy = "terraform"
